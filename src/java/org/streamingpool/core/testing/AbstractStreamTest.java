@@ -25,6 +25,7 @@ package org.streamingpool.core.testing;
 import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD;
 
 import org.junit.runner.RunWith;
+import org.reactivestreams.Publisher;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -32,8 +33,22 @@ import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import org.streamingpool.core.conf.DefaultStreamFactories;
 import org.streamingpool.core.conf.EmbeddedPoolConfiguration;
 import org.streamingpool.core.conf.StreamCreatorFactoryConfiguration;
+import org.streamingpool.core.service.StreamId;
 import org.streamingpool.core.support.AbstractStreamSupport;
 
+/**
+ * Convenience abstract class providing the more commonly needed infrastructure to test one's Stream.
+ *
+ * <b>Why the {@link DirtiesContext} 'BEFORE_EACH_TEST_METHOD'?</b>
+ * <p>
+ * So that each test can:
+ * <p>
+ * - call {@link org.streamingpool.core.service.ProvidingService#provide(StreamId, Publisher)} for any {@link StreamId}
+ * <p>
+ * - call {@link org.reactivestreams.Processor#onError(Throwable)} or other disruptive methods to any stream
+ * <p>
+ * and the next test will start with a blank slate
+ */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { EmbeddedPoolConfiguration.class, DefaultStreamFactories.class,
         StreamCreatorFactoryConfiguration.class }, loader = AnnotationConfigContextLoader.class)
